@@ -1,18 +1,35 @@
 name: Deploy Website
 
-on: [push]
+on:
+  push:
+    branches:
+      - main  # or your default branch
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    name: Deploying to surge
+    name: Deploying to Surge
+
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v3
+
       - name: Install Node.js
-        uses: actions/setup-node@v2-beta
+        uses: actions/setup-node@v3
         with:
-          node-version: 12
-      - name: Install Surge
+          node-version: 16  # Update to a supported version if needed
+
+      - name: Install dependencies
+        run: |
+          npm install
+
+      - name: Build project
+        run: |
+          npm run build  # Ensure the build command works for your project
+
+      - name: Install Surge CLI
         run: npm install -g surge
-      - name: Run surge
-        run: surge ./ dice_game_by_wajiha.surge.sh --token ${{ secrets.dice_game }}
+
+      - name: Deploy to Surge
+        run: surge ./build dice_game_by_wajiha.surge.sh --token ${{ secrets.dice_game }} --clear-cache
+
